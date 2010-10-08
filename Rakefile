@@ -4,14 +4,20 @@ require 'rake'
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
-    gem.name = "analytico_ruby"
-    gem.summary = %Q{TODO: one-line summary of your gem}
-    gem.description = %Q{TODO: longer description of your gem}
-    gem.email = "mauricio@edge14.com"
-    gem.homepage = "http://github.com/mgomes/analytico_ruby"
+    gem.name = "analytico"
+    gem.summary = %Q{Ruby client for Analytico}
+    gem.description = %Q{Ruby client for the Analytico impression and app metric tracking service.}
+    gem.email = "mgomes@geminisbs.com"
+    gem.homepage = "http://github.com/geminisbs/analytico_ruby"
     gem.authors = ["Mauricio Gomes"]
+    
+    gem.add_dependency "yajl-ruby", "~> 0.7.7"
+    gem.add_dependency "rest-client", "~> 1.6.0"
+    gem.add_dependency "rack", "> 1.0.0"
+    
     gem.add_development_dependency "rspec", ">= 1.2.9"
-    # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
+    
+    gem.files = FileList['lib/**/*.rb', 'VERSION', 'LICENSE', "README.rdoc"]
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
@@ -39,7 +45,7 @@ Rake::RDocTask.new do |rdoc|
   version = File.exist?('VERSION') ? File.read('VERSION') : ""
 
   rdoc.rdoc_dir = 'rdoc'
-  rdoc.title = "analytico_ruby #{version}"
+  rdoc.title = "analytico #{version}"
   rdoc.rdoc_files.include('README*')
   rdoc.rdoc_files.include('lib/**/*.rb')
 end
