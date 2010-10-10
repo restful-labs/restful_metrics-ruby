@@ -13,7 +13,7 @@ require 'analytico/railtie/rack_impression'
 
 module Analytico
   
-  REALM = "http://0.0.0.0:3000"
+  REALM = "http://analytico.heroku.com"
   VERSION = File.read(File.join(File.dirname(__FILE__), '..', 'VERSION'))
 
   class AnalyticoError < StandardError; end
