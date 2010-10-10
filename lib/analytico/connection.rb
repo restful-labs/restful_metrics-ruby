@@ -50,7 +50,7 @@ module Analytico
 
       if debug
         if response.nil?
-          puts "Response from server was nil or there was an error processing it."
+          puts "There was an error processing the response from Analytico."
         else
           puts "\nresponse: #{response.code}"
           puts "headers:"
@@ -78,7 +78,11 @@ module Analytico
 
     def send_request(method, endpoint, headers, data=nil)      
       begin
-        response = RestClient::Request.execute(:method => :post, :url => endpoint, :payload => data, :headers => headers, :timeout => 0.1)
+        response = RestClient::Request.execute(:method => :post, 
+                                                :url => endpoint, 
+                                                :payload => data, 
+                                                :headers => headers, 
+                                                :timeout => 0.1)
       rescue => e
         logger("there was an error transmitting your entry: #{$!}")
         return nil
@@ -92,7 +96,7 @@ module Analytico
       if defined? Rails
         Rails.logger.info msg
       else
-        puts msg
+        STDERR.puts msg
       end
     end
 
