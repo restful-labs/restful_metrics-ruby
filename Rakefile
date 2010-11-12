@@ -14,8 +14,9 @@ begin
     gem.add_dependency "yajl-ruby", "~> 0.7.7"
     gem.add_dependency "rest-client", "~> 1.6.0"
     gem.add_dependency "rack", "> 1.0.0"
+    gem.add_dependency "delayed_job", ">= 2.1.0pre2"
     
-    gem.add_development_dependency "rspec", ">= 1.2.9"
+    gem.add_development_dependency "rspec", "< 2.0.0"
     
     gem.files = FileList['lib/**/*.rb', 'VERSION', 'LICENSE', "README.rdoc"]
   end
