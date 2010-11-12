@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{analytico}
-  s.version = "0.2.0"
+  s.version = "0.2.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Mauricio Gomes"]
-  s.date = %q{2010-10-09}
+  s.date = %q{2010-11-11}
   s.description = %q{Ruby client for the Analytico impression and app metric tracking service.}
   s.email = %q{mgomes@geminisbs.com}
   s.extra_rdoc_files = [
@@ -25,7 +25,8 @@ Gem::Specification.new do |s|
      "lib/analytico/connection.rb",
      "lib/analytico/endpoint.rb",
      "lib/analytico/hash_utils.rb",
-     "lib/analytico/railtie/rack_impression.rb"
+     "lib/analytico/railtie/rack_impression.rb",
+     "lib/delayed/backend/mock.rb"
   ]
   s.homepage = %q{http://github.com/geminisbs/analytico_ruby}
   s.rdoc_options = ["--charset=UTF-8"]
@@ -33,7 +34,8 @@ Gem::Specification.new do |s|
   s.rubygems_version = %q{1.3.7}
   s.summary = %q{Ruby client for Analytico}
   s.test_files = [
-    "spec/analytico_spec.rb",
+    "spec/analytico_client_spec.rb",
+     "spec/analytico_spec.rb",
      "spec/spec_helper.rb"
   ]
 
@@ -45,18 +47,27 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<yajl-ruby>, ["~> 0.7.7"])
       s.add_runtime_dependency(%q<rest-client>, ["~> 1.6.0"])
       s.add_runtime_dependency(%q<rack>, ["> 1.0.0"])
-      s.add_development_dependency(%q<rspec>, [">= 1.2.9"])
+      s.add_runtime_dependency(%q<i18n>, [">= 0"])
+      s.add_runtime_dependency(%q<activesupport>, [">= 0"])
+      s.add_runtime_dependency(%q<delayed_job>, ["< 2.1.0"])
+      s.add_development_dependency(%q<rspec>, ["< 2.0.0"])
     else
       s.add_dependency(%q<yajl-ruby>, ["~> 0.7.7"])
       s.add_dependency(%q<rest-client>, ["~> 1.6.0"])
       s.add_dependency(%q<rack>, ["> 1.0.0"])
-      s.add_dependency(%q<rspec>, [">= 1.2.9"])
+      s.add_dependency(%q<i18n>, [">= 0"])
+      s.add_dependency(%q<activesupport>, [">= 0"])
+      s.add_dependency(%q<delayed_job>, ["< 2.1.0"])
+      s.add_dependency(%q<rspec>, ["< 2.0.0"])
     end
   else
     s.add_dependency(%q<yajl-ruby>, ["~> 0.7.7"])
     s.add_dependency(%q<rest-client>, ["~> 1.6.0"])
     s.add_dependency(%q<rack>, ["> 1.0.0"])
-    s.add_dependency(%q<rspec>, [">= 1.2.9"])
+    s.add_dependency(%q<i18n>, [">= 0"])
+    s.add_dependency(%q<activesupport>, [">= 0"])
+    s.add_dependency(%q<delayed_job>, ["< 2.1.0"])
+    s.add_dependency(%q<rspec>, ["< 2.0.0"])
   end
 end
 
