@@ -63,6 +63,10 @@ module Analytico
       end
 
       def post(endpoint, data=nil)
+        unless production_env?
+          warn "Analytico: Skipping communication to endpoint #{endpoint} while not in production. Would have sent: #{data.inspect}"
+          return nil
+        end
         @@connection.post endpoint, data
       end
 
@@ -74,6 +78,12 @@ module Analytico
         else
           return {}
         end
+      end
+
+      def production_env?
+        return true if defined?(RAILS_ENV) && RAILS_ENV == "production"
+        return true if defined?(Rails) && Rails.respond_to?(:env) && Rails.env == "production"
+        return false
       end
 
     end
