@@ -14,7 +14,9 @@ begin
     gem.add_dependency "yajl-ruby", "~> 0.7.7"
     gem.add_dependency "rest-client", "~> 1.6.0"
     gem.add_dependency "rack", "> 1.0.0"
-    gem.add_dependency "delayed_job", ">= 2.1.0pre2"
+    gem.add_dependency "i18n"
+    gem.add_dependency "activesupport"
+    gem.add_dependency "delayed_job", "< 2.1.0"
     
     gem.add_development_dependency "rspec", "< 2.0.0"
     

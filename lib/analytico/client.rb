@@ -55,11 +55,11 @@ module Analytico
       end
 
       def async_impression(*args)
-        self.delay.add_impression(*args)
+        self.send_later(:add_impression, *args)
       end
 
       def async_metric(*args)
-        self.delay.add_metric(*args)
+        self.send_later(:add_metric, *args)
       end
 
       def post(endpoint, data=nil)
