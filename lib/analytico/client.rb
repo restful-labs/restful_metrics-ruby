@@ -1,3 +1,6 @@
+require 'active_support/core_ext'
+require 'delayed_job'
+
 module Analytico
 
   class Client
