@@ -69,13 +69,21 @@ module Analytico
           return nil
         end
         if @@async
-          self.send_later @@connection.post(endpoint, data)
+          self.send_later :transmit, endpoint, data
         else
-          @@connection.post endpoint, data
+          transmit endpoint, data
         end
       end
 
     private
+    
+      def transmit(endpoint, data)
+        begin
+          @@connection.post(endpoint, data)
+        rescue
+          warn "%%% Analytico %%% There was an error communicating with Analytico"
+        end
+      end
 
       def extract_options!(args)
         if args.last.is_a?(Hash)
