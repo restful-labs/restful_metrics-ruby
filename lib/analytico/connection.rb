@@ -2,13 +2,14 @@ module Analytico
 
   class Connection
 
-    attr_accessor :debug
+    attr_accessor :debug, :async
     attr_reader :api_key, :default_options
 
     def initialize(api_key)
       @api_key = api_key
       @default_options = { }
       @debug = false
+      @async = false
     end
 
     def post(endpoint, data=nil)
@@ -78,11 +79,18 @@ module Analytico
 
     def send_request(method, endpoint, headers, data=nil)      
       begin
-        response = RestClient::Request.execute(:method => :post, 
-                                                :url => endpoint, 
-                                                :payload => data, 
-                                                :headers => headers, 
-                                                :timeout => 0.1)
+        if @async
+          response = RestClient::Request.execute(:method => :post, 
+                                                 :url => endpoint, 
+                                                 :payload => data, 
+                                                 :headers => headers)
+        else
+          response = RestClient::Request.execute(:method => :post, 
+                                                 :url => endpoint, 
+                                                 :payload => data, 
+                                                 :headers => headers, 
+                                                 :timeout => 0.1)
+        end
       rescue => e
         logger("there was an error transmitting your entry: #{$!}")
         return nil

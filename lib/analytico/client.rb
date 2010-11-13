@@ -6,13 +6,13 @@ module Analytico
   class Client
 
     @@connection = nil
-    @@debug = false
+    @@debug, @@async = false
 
     class << self
 
       def set_credentials(api_key)
         @@connection = Connection.new(api_key)
-        @@connection.debug = @@debug
+        self.debug = @@debug
         true
       end
 
@@ -23,6 +23,15 @@ module Analytico
 
       def debug
         @@debug
+      end
+      
+      def async=(async_flag)
+        @@async = async_flag
+        @@connection.async = @@async if @@connection
+      end
+      
+      def async
+        @@async
       end
       
       def add_impression(*args)
@@ -54,20 +63,16 @@ module Analytico
         HashUtils.recursively_symbolize_keys(response)
       end
 
-      def async_impression(*args)
-        self.send_later(:add_impression, *args)
-      end
-
-      def async_metric(*args)
-        self.send_later(:add_metric, *args)
-      end
-
       def post(endpoint, data=nil)
         unless production_env?
-          warn "Analytico: Skipping communication to endpoint #{endpoint} while not in production. Would have sent: #{data.inspect}"
+          warn "%%% Analytico %%% Skipping while not in production. Would have sent (async: #{@@async ? 'on' : 'off' }): #{data.inspect}"
           return nil
         end
-        @@connection.post endpoint, data
+        if @@async
+          self.send_later @@connection.post(endpoint, data)
+        else
+          @@connection.post endpoint, data
+        end
       end
 
     private
