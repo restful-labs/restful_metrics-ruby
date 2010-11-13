@@ -74,9 +74,7 @@ module Analytico
           transmit endpoint, data
         end
       end
-
-    private
-    
+      
       def transmit(endpoint, data)
         begin
           @@connection.post(endpoint, data)
@@ -84,6 +82,8 @@ module Analytico
           warn "%%% Analytico %%% There was an error communicating with Analytico"
         end
       end
+
+    private
 
       def extract_options!(args)
         if args.last.is_a?(Hash)
