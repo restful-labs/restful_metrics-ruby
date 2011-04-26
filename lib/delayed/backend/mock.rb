@@ -1,3 +1,5 @@
+# Used by Delayed::Job during testing
+
 module Delayed
   module Backend
     module Mock
