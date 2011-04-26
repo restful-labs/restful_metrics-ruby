@@ -1,13 +1,15 @@
-module Analytico
+module RestfulMetrics
 
   class Connection
+    
+    include RestfulMetrics::LogTools
 
     attr_accessor :debug, :async
     attr_reader :api_key, :default_options
 
     def initialize(api_key)
       @api_key = api_key
-      @default_options = { }
+      @default_options = { :api_key => @api_key }
       @debug = false
       @async = false
     end
@@ -19,7 +21,7 @@ module Analytico
   private
 
     def request(method, endpoint, data=nil)
-      headers = { 'User-Agent' => "Analytico Ruby Client v#{VERSION}",
+      headers = { 'User-Agent' => "Restful Metrics Ruby Client v#{VERSION}",
                   'Content-Type' => "application/json" }
       
       if data.nil?
@@ -43,7 +45,7 @@ module Analytico
       begin
         data = Yajl::Encoder.encode data
       rescue
-        logger("there was an error encoding your submission: #{$!}")
+        logger "there was an error encoding your submission: #{$!}"
         return nil
       end
         
@@ -51,7 +53,7 @@ module Analytico
 
       if debug
         if response.nil?
-          puts "There was an error processing the response from Analytico."
+          puts "There was an error processing the response from Restful Metrics."
         else
           puts "\nresponse: #{response.code}"
           puts "headers:"
@@ -69,7 +71,7 @@ module Analytico
         begin
           content = Yajl::Parser.new.parse(response.body)
         rescue
-          logger("received invalid response: #{$!}")
+          logger "received invalid response: #{$!}"
           return "{}"
         end
       end
@@ -79,33 +81,16 @@ module Analytico
 
     def send_request(method, endpoint, headers, data=nil)      
       begin
-        if @async
-          response = RestClient::Request.execute(:method => :post, 
-                                                 :url => endpoint, 
-                                                 :payload => data, 
-                                                 :headers => headers)
-        else
-          response = RestClient::Request.execute(:method => :post, 
-                                                 :url => endpoint, 
-                                                 :payload => data, 
-                                                 :headers => headers, 
-                                                 :timeout => 0.1)
-        end
+        response = RestClient::Request.execute(:method => :post, 
+                                               :url => endpoint, 
+                                               :payload => data, 
+                                               :headers => headers)
       rescue => e
-        logger("there was an error transmitting your entry: #{$!}")
+        logger "there was an error transmitting your entry: #{$!}"
         return nil
       end
 
       response
-    end
-    
-    def logger(error_msg)
-      msg = "%%%% There was an error communicating with Analytico: #{error_msg}"
-      if defined? Rails
-        Rails.logger.info msg
-      else
-        STDERR.puts msg
-      end
     end
 
   end
