@@ -5,7 +5,7 @@ module RestfulMetrics
     extend LogTools
 
     @@connection = nil
-    @@debug, @@async = false
+    @@debug, @@async, @@disabled = false
 
     class << self
 
@@ -31,6 +31,14 @@ module RestfulMetrics
       
       def async?
         @@async
+      end
+      
+      def disabled=(disabled_flag)
+        @@disabled = disabled_flag
+      end
+      
+      def disabled?
+        @@disabled
       end
       
       def add_metric(fqdn, name, value, distinct_id = nil)
@@ -62,6 +70,7 @@ module RestfulMetrics
     private
     
       def post(endpoint, data=nil)
+        return false if disabled?
         raise NoConnectionEstablished if @@connection.nil?
         
         unless production_env?

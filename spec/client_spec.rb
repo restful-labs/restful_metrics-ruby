@@ -16,12 +16,35 @@ describe "A NON-initialized Restful Metrics client" do
   
 end
 
+describe "A disabled Restful Metrics client" do
+  
+  before(:each) do
+    RestfulMetrics::Client.disabled = true
+  end
+  
+  it "should identify itself as disabled" do
+    RestfulMetrics::Client.disabled?.should == true
+  end
+  
+  it "should NOT send a metric if the client is in disabled-mode" do
+    RestfulMetrics::Client.expects(:transmit).never
+    RestfulMetrics::Client.add_metric("foo.bar.org", "hit", 1).should == false
+  end
+  
+  it "should NOT send a compound metric if the client is in disabled-mode" do
+    RestfulMetrics::Client.expects(:transmit).never
+    RestfulMetrics::Client.add_compound_metric("foo.bar.org", "hit", [1,2,3]).should == false
+  end
+  
+end
+
 describe "An initialized Restful Metrics client" do
   
   before(:each) do
     @connection = RestfulMetrics::Connection
     @connection.any_instance.stubs(:post).returns(true)
     RestfulMetrics::Client.set_credentials('xyz123')
+    RestfulMetrics::Client.disabled = false
     Delayed::Job.reset
   end
   
