@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{restful_metrics}
-  s.version = "0.5.2"
+  s.version = "0.5.4"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Mauricio Gomes"]
-  s.date = %q{2011-05-12}
+  s.date = %q{2011-06-29}
   s.description = %q{Ruby client for the Restful Metrics service.}
   s.email = %q{mgomes@geminisbs.com}
   s.extra_rdoc_files = [
