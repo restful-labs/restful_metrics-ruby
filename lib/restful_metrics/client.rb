@@ -25,6 +25,9 @@ module RestfulMetrics
       end
       
       def async=(async_flag)
+        # DelayedJob integration
+        require 'delayed_job' if async_flag
+        
         @@async = async_flag && (defined?(Delayed) != nil)
         @@connection.async = @@async if @@connection
       end

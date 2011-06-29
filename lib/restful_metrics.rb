@@ -26,10 +26,3 @@ module RestfulMetrics
   class NoConnectionEstablished < RestfulMetricsError; end
   
 end
-
-# DelayedJob integration
-begin
-  require 'delayed_job'
-rescue LoadError
-  RestfulMetrics::LogTools.logger 'Running in synchronous mode.'
-end
