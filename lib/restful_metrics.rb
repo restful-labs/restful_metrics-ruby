@@ -31,5 +31,5 @@ end
 begin
   require 'delayed_job'
 rescue LoadError
-  RestfulMetrics.logger 'Running in synchronous mode.'
+  RestfulMetrics::LogTools.logger 'Running in synchronous mode.'
 end
