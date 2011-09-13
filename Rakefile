@@ -12,10 +12,10 @@ require 'rake'
 require 'jeweler'
 Jeweler::Tasks.new do |gem|
   gem.name = "restful_metrics"
-  gem.summary = %Q{Ruby client for Restful Metrics}
-  gem.description = %Q{Ruby client for the Restful Metrics service.}
-  gem.email = "mgomes@geminisbs.com"
-  gem.homepage = "http://github.com/geminisbs/restful_metrics-ruby"
+  gem.summary = %Q{Ruby client for RESTful Metrics}
+  gem.description = %Q{Ruby client for the RESTful Metrics service.}
+  gem.email = "mauricio@restful-labs.com"
+  gem.homepage = "http://restfulmetrics.com"
   gem.authors = ["Mauricio Gomes"]
   
   gem.add_dependency "yajl-ruby", "~> 0.8.2"
@@ -27,7 +27,7 @@ Jeweler::Tasks.new do |gem|
   gem.add_development_dependency "delayed_job", "< 2.1.0"
   gem.add_development_dependency "rspec", "< 2.0.0"
   
-  gem.files = FileList['lib/**/*.rb', 'VERSION', 'LICENSE', "README.rdoc"]
+  gem.files = FileList['lib/**/*.rb', 'VERSION', 'LICENSE', "README.md"]
 end
 Jeweler::RubygemsDotOrgTasks.new
 
