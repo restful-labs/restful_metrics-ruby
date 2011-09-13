@@ -9,6 +9,7 @@ require 'action_controller/test_process'
 require 'rspec'
 require 'mocha'
 require 'restful_metrics'
+require 'delayed_job'
 
 # Requires supporting files with custom matchers and macros, etc,
 # in ./support/ and its subdirectories.

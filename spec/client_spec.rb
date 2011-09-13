@@ -2,16 +2,37 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 describe "A NON-initialized Restful Metrics client" do
   
-  it "should NOT send a metric if a connection is not initialized" do
+  it "should NOT send a metric data point" do
     lambda { 
       RestfulMetrics::Client.add_metric("foo.bar.org", "hit", 1)
     }.should raise_error(RestfulMetrics::NoConnectionEstablished)
   end
   
-  it "should NOT send a compound metric if a connection is not initialized" do
+  it "should NOT send a compound metric data point" do
     lambda { 
       RestfulMetrics::Client.add_compound_metric("foo.bar.org", "hit", [1,2,3])
     }.should raise_error(RestfulMetrics::NoConnectionEstablished)
+  end
+  
+  describe "in a Heroku environment" do
+    
+    before(:each) do
+      ENV["RESTFUL_METRICS_API_KEY"] = "xyz123"
+      RestfulMetrics::Connection.any_instance.stubs(:post).returns(100)
+    end
+    
+    it "should send a metric data point" do
+      rails_env "production" do
+        RestfulMetrics::Client.add_metric("foo.bar.org", "hit", 1).should be_true
+      end
+    end
+  
+    it "should send a compound metric data point" do
+      rails_env "production" do
+        RestfulMetrics::Client.add_compound_metric("foo.bar.org", "hit", [1,2,3]).should be_true
+      end
+    end
+    
   end
   
 end

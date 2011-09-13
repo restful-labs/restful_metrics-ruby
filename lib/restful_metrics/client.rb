@@ -74,7 +74,13 @@ module RestfulMetrics
     
       def post(endpoint, data=nil)
         return false if disabled?
-        raise NoConnectionEstablished if @@connection.nil?
+        if @@connection.nil?
+          if ENV["RESTFUL_METRICS_API_KEY"]
+            @@connection = Connection.new(ENV["RESTFUL_METRICS_API_KEY"])
+          else
+            raise NoConnectionEstablished
+          end
+        end
         
         unless production_env?
           logger "Skipping while not in production", :info

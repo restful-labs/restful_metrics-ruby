@@ -20,6 +20,8 @@ The only step required for initialization is setting your API key. Once it's set
     RestfulMetrics::Client.set_credentials('214c7da8edd333abc78712313918ffe5')
 ```
 
+You can skip this step if you've installed the RESTful Metrics Heroku Addon.
+
 ### Disable Flag
 
 The client also has an optional flag that prevents the client from actually sending data points to the server. This allows you to keep your RESTful Metrics tracking code in place even in your test enviornments. You can disable the client with the following (by default the client is enabled):
