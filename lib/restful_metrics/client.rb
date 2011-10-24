@@ -4,7 +4,7 @@ module RestfulMetrics
     
     extend LogTools
 
-    @@connection = nil
+    @@connection, @@fqdn = nil
     @@debug, @@async, @@disabled = false
 
     class << self
@@ -13,6 +13,10 @@ module RestfulMetrics
         @@connection = Connection.new(api_key)
         self.debug = @@debug
         true
+      end
+      
+      def set_app_id(fqdn)
+        @@fqdn=fqdn
       end
 
       def debug=(debug_flag)
@@ -69,6 +73,16 @@ module RestfulMetrics
         
         post(Endpoint.compound_metrics, params)
       end
+      
+      # for hole app usage 
+      # use in initializer: RestfulMetrics::Client.set_app_id(your-app-id)
+      def add_simple_metric(name, value, distinct_id = nil)
+         @@fqdn.nil? ? false : add_metric(@@fqdn, name, value, distinct_id)
+      end
+      
+      def add_simple_compound_metric(name, values, distinct_id = nil) 
+      	@@fqdn.nil? ? false : add_compound_metric(@@fqdn, name, values, distinct_id)
+      end
 
     private
     
@@ -82,8 +96,8 @@ module RestfulMetrics
           end
         end
         
-        unless production_env?
-          logger "Skipping while not in production", :info
+        if development_env? # changed to development
+          logger "Data(not send): " << data.inspect, :info
           return false
         end
         
@@ -113,11 +127,11 @@ module RestfulMetrics
         end
       end
 
-      def production_env?
-        return true if defined?(RAILS_ENV) && RAILS_ENV == "production"
-        return true if defined?(RACK_ENV) && RACK_ENV == "production"
+      def development_env? # changed to development
+        return true if defined?(RAILS_ENV) && RAILS_ENV == "development"
+        return true if defined?(RACK_ENV) && RACK_ENV == "development"
         
-        if defined?(Rails.env) && Rails.env == "production"
+        if defined?(Rails.env) && Rails.env == "development"
           return true
         end
         

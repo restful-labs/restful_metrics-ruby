@@ -84,7 +84,7 @@ describe "An initialized Restful Metrics client" do
   
   describe "environment detection" do
     
-    it "should return false if NOT in production" do
+    it "should return false if IN development" do
       rails_env "development" do
         RestfulMetrics::Client.expects(:logger).returns('')
         RestfulMetrics::Client.add_metric("foo.bar.org", "hit", 1).should be_false
@@ -104,6 +104,36 @@ describe "An initialized Restful Metrics client" do
       RestfulMetrics::Client.add_metric("foo.bar.org", "hit", 1).should be_true
     end
     
+  end
+  
+  describe "using an app-id in whole app" do
+  
+     it "should return false if app-id is NOT set for add_simple_metric" do
+       rails_env "production" do
+         RestfulMetrics::Client.add_simple_metric("hit", 1).should be_false
+       end
+     end
+     
+     it "should return false if app-id is NOT set for add_simple_compound_metric" do
+       rails_env "production" do
+         RestfulMetrics::Client.add_simple_compound_metric("hit", [1,2,3]).should be_false
+       end
+     end
+
+    it "should successfully send the request if the app-id IS set for add_simple_metric" do
+      rails_env "production" do
+        RestfulMetrics::Client.set_app_id('app12345').should be_true
+        RestfulMetrics::Client.add_simple_metric("hit", 1).should be_true
+      end
+    end
+    
+    it "should successfully send the request if the app-id IS set for add_simple_compound_metric" do
+      rails_env "production" do
+        RestfulMetrics::Client.set_app_id('app12345').should be_true
+        RestfulMetrics::Client.add_simple_compound_metric("hit", [1,2,3]).should be_true
+      end
+    end
+ 
   end
 
   describe "adding metrics synchronously" do
