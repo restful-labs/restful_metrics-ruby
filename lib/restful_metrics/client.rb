@@ -1,7 +1,7 @@
 module RestfulMetrics
 
   class Client
-    
+
     extend LogTools
 
     @@connection = nil
@@ -23,27 +23,27 @@ module RestfulMetrics
       def debug
         @@debug
       end
-      
+
       def async=(async_flag)
         # DelayedJob integration
         require 'delayed_job' if async_flag
-        
+
         @@async = async_flag && (defined?(Delayed) != nil)
         @@connection.async = @@async if @@connection
       end
-      
+
       def async?
         @@async
       end
-      
+
       def disabled=(disabled_flag)
         @@disabled = disabled_flag
       end
-      
+
       def disabled?
         @@disabled
       end
-      
+
       def add_metric(fqdn, name, value, distinct_id = nil)
         params = Hash.new
         params[:metric] = Hash.new
@@ -53,11 +53,11 @@ module RestfulMetrics
         unless distinct_id.nil?
           params[:metric][:distinct_id] = distinct_id
         end
-        
+
         post(Endpoint.metrics, params)
       end
-      
-      def add_compound_metric(fqdn, name, values, distinct_id = nil) 
+
+      def add_compound_metric(fqdn, name, values, distinct_id = nil)
         params = Hash.new
         params[:compound_metric] = Hash.new
         params[:compound_metric][:fqdn] = fqdn
@@ -66,14 +66,18 @@ module RestfulMetrics
         unless distinct_id.nil?
           params[:compound_metric][:distinct_id] = distinct_id
         end
-        
+
         post(Endpoint.compound_metrics, params)
       end
 
     private
-    
+
       def post(endpoint, data=nil)
-        return false if disabled?
+        if disabled?
+          logger "Skipping data points (client disabled)", :info
+          return false
+        end
+
         if @@connection.nil?
           if ENV["RESTFUL_METRICS_API_KEY"]
             @@connection = Connection.new(ENV["RESTFUL_METRICS_API_KEY"])
@@ -81,20 +85,15 @@ module RestfulMetrics
             raise NoConnectionEstablished
           end
         end
-        
-        unless production_env?
-          logger "Skipping while not in production", :info
-          return false
-        end
-        
+
         if async?
-          self.delay.transmit endpoint, data
+          self.delay.transmit(endpoint, data)
           true
         else
-          transmit endpoint, data
+          transmit(endpoint, data)
         end
       end
-      
+
       def transmit(endpoint, data)
         begin
           @@connection.post(endpoint, data)
@@ -111,17 +110,6 @@ module RestfulMetrics
         else
           return {}
         end
-      end
-
-      def production_env?
-        return true if defined?(RAILS_ENV) && RAILS_ENV == "production"
-        return true if defined?(RACK_ENV) && RACK_ENV == "production"
-        
-        if defined?(Rails.env) && Rails.env == "production"
-          return true
-        end
-        
-        false
       end
 
     end
