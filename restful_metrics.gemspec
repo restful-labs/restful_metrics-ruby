@@ -2,7 +2,7 @@
 $:.push File.expand_path("../lib", __FILE__)
 
 Gem::Specification.new do |s|
-  s.name = %q{couchlogic}
+  s.name = %q{restful_metrics}
   s.summary = %q{Ruby client for the RESTful Metrics service.}
   s.description = %q{Ruby client for the RESTful Metrics service.}
   s.homepage = %q{http://github.com/restful-labs/resetful_metrics-ruby}
