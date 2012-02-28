@@ -20,7 +20,7 @@ module RestfulMetrics
         @@connection.debug = @@debug if @@connection
       end
 
-      def debug
+      def debug?
         @@debug
       end
 
@@ -78,13 +78,7 @@ module RestfulMetrics
           return false
         end
 
-        if @@connection.nil?
-          if ENV["RESTFUL_METRICS_API_KEY"]
-            @@connection = Connection.new(ENV["RESTFUL_METRICS_API_KEY"])
-          else
-            raise NoConnectionEstablished
-          end
-        end
+        raise NoConnectionEstablished if @@connection.nil?
 
         if async?
           self.delay.transmit(endpoint, data)
@@ -99,7 +93,7 @@ module RestfulMetrics
           @@connection.post(endpoint, data)
           true
         rescue
-          logger "There was an error communicating with the server"
+          logger "There was an error communicating with the server: #{$!}"
           false
         end
       end

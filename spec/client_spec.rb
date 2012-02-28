@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
-describe "A NON-initialized Restful Metrics client" do
+describe "A NON-initialized RESTful Metrics client" do
 
   it "should NOT send a metric data point" do
     lambda {
@@ -21,19 +21,23 @@ describe "A NON-initialized Restful Metrics client" do
       RestfulMetrics::Connection.any_instance.stubs(:post).returns(100)
     end
 
-    it "should send a metric data point" do
-      RestfulMetrics::Client.add_metric("foo.bar.org", "hit", 1).should be_true
+    it "should NOT send a metric data point" do
+      lambda {
+        RestfulMetrics::Client.add_metric("foo.bar.org", "hit", 1).should be_true
+      }.should raise_error(RestfulMetrics::NoConnectionEstablished)
     end
 
-    it "should send a compound metric data point" do
-      RestfulMetrics::Client.add_compound_metric("foo.bar.org", "hit", [1,2,3]).should be_true
+    it "should NOT send a compound metric data point" do
+      lambda {
+        RestfulMetrics::Client.add_compound_metric("foo.bar.org", "hit", [1,2,3]).should be_true
+      }.should raise_error(RestfulMetrics::NoConnectionEstablished)
     end
 
   end
 
 end
 
-describe "A disabled Restful Metrics client" do
+describe "A disabled RESTful Metrics client" do
 
   before(:each) do
     RestfulMetrics::Client.disabled = true
@@ -55,17 +59,57 @@ describe "A disabled Restful Metrics client" do
 
 end
 
-describe "An initialized Restful Metrics client" do
+describe "An initialized RESTful Metrics client" do
 
   before(:each) do
     @connection = RestfulMetrics::Connection
-    @connection.any_instance.stubs(:post).returns(true)
     RestfulMetrics::Client.set_credentials('xyz123')
     RestfulMetrics::Client.disabled = false
     Delayed::Job.delete_all
   end
 
+  describe "in debug mode" do
+
+    class SampleRequest
+
+      def body
+        '{ "test": "success" }'
+      end
+
+      def code
+        200
+      end
+
+      def header
+        { "one" => "test", "two" => "test" }
+      end
+
+    end
+
+    before(:all) do
+      RestfulMetrics::Client.debug = true
+      RestfulMetrics::Client.debug?.should be_true
+    end
+
+    it "should send a metric to RESTful Metrics while outputting debug info" do
+      @connection.any_instance.expects(:logger).at_least_once
+      @connection.any_instance.expects(:send_request).once.returns(SampleRequest.new)
+      RestfulMetrics::Client.add_metric("foo.bar.org", "hit", 1).should == true
+    end
+
+    it "should send the compound metric to RESTful Metrics while outputting debug info" do
+      @connection.any_instance.expects(:logger).at_least_once
+      @connection.any_instance.expects(:send_request).once.returns(SampleRequest.new)
+      RestfulMetrics::Client.add_compound_metric("foo.bar.org", "hit", [1,2,3]).should be_true
+    end
+
+  end
+
   describe "initializing the client" do
+
+    before(:each) do
+      @connection.any_instance.stubs(:post).returns(true)
+    end
 
     it "should set the API key" do
       RestfulMetrics::Client.set_credentials('4ed4ef44e44ed4').should be_true
@@ -80,17 +124,21 @@ describe "An initialized Restful Metrics client" do
 
   describe "adding metrics synchronously" do
 
+    before(:each) do
+      @connection.any_instance.stubs(:post).returns(true)
+    end
+
     before(:all) do
       RestfulMetrics::Client.async = false
       RestfulMetrics::Client.async?.should be_false
     end
 
-    it "should send the metric to Restful Metrics" do
+    it "should send the metric to RESTful Metrics" do
       @connection.any_instance.expects(:post).at_least_once.returns({})
       RestfulMetrics::Client.add_metric("foo.bar.org", "hit", 1).should be_true
     end
 
-    it "should send the compound metric to Restful Metrics" do
+    it "should send the compound metric to RESTful Metrics" do
       @connection.any_instance.expects(:post).at_least_once.returns({})
       RestfulMetrics::Client.add_compound_metric("foo.bar.org", "hit", [1,2,3]).should be_true
     end
@@ -98,6 +146,10 @@ describe "An initialized Restful Metrics client" do
   end
 
   describe "adding metrics asynchronously" do
+
+    before(:each) do
+      @connection.any_instance.stubs(:post).returns(true)
+    end
 
     before(:all) do
       RestfulMetrics::Client.async = true
