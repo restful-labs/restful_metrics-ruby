@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.summary = %q{Ruby client for the RESTful Metrics service.}
   s.description = %q{Ruby client for the RESTful Metrics service.}
   s.homepage = %q{http://github.com/restful-labs/resetful_metrics-ruby}
-  s.version = "1.1.0"
+  s.version = File.read(File.join(File.dirname(__FILE__), 'VERSION'))
   s.authors = ["Mauricio Gomes"]
   s.email = "mauricio@restful-labs.com"
 
