@@ -1,4 +1,4 @@
-# Restful Metrics Ruby Client
+# RESTful Metrics Ruby Client
 
 Tracks your app's custom business metrics in your Ruby apps.
 
@@ -78,7 +78,7 @@ You would transmit this data point with the following:
 
 ## Copyright
 
-Copyright (c) 2011 Restful Labs LLC. See LICENSE for details.
+Copyright (c) 2011-2012 RESTful Labs LLC. See LICENSE for details.
 
 ## Authors
 
