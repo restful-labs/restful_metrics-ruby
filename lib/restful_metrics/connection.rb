@@ -2,7 +2,7 @@ module RestfulMetrics
 
   class Connection
 
-    extend LogTools
+    include LogTools
 
     attr_accessor :debug, :async
     attr_reader :api_key, :default_options
