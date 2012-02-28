@@ -1,8 +1,8 @@
 module RestfulMetrics
 
   class Connection
-    
-    include RestfulMetrics::LogTools
+
+    extend LogTools
 
     attr_accessor :debug, :async
     attr_reader :api_key, :default_options
@@ -23,7 +23,7 @@ module RestfulMetrics
     def request(method, endpoint, data=nil)
       headers = { 'User-Agent' => "Restful Metrics Ruby Client v#{VERSION}",
                   'Content-Type' => "application/json" }
-      
+
       if data.nil?
         data = @default_options
       else
@@ -31,14 +31,14 @@ module RestfulMetrics
       end
 
       if debug
-        puts "request: #{method.to_s.upcase} #{endpoint}"
-        puts "headers:"
+        logger "request: #{method.to_s.upcase} #{endpoint}"
+        logger "headers:"
         headers.each do |key, value|
-          puts "#{key}=#{value}"
+          logger "#{key}=#{value}"
         end
         if [:post, :put].include?(method)
-          puts "data:"
-          puts Yajl::Encoder.encode data
+          logger "data:"
+          logger Yajl::Encoder.encode data
         end
       end
 
@@ -48,20 +48,20 @@ module RestfulMetrics
         logger "there was an error encoding your submission: #{$!}"
         return nil
       end
-        
+
       response = send_request(method, endpoint, headers, data)
 
       if debug
         if response.nil?
-          puts "There was an error processing the response from Restful Metrics."
+          logger "There was an error processing the response from Restful Metrics."
         else
-          puts "\nresponse: #{response.code}"
-          puts "headers:"
+          logger "\nresponse: #{response.code}"
+          logger "headers:"
           response.header.each do |key, value|
-            puts "#{key}=#{value}"
+            logger "#{key}=#{value}"
           end
-          puts "body:"
-          puts response.body
+          logger "body:"
+          logger response.body
         end
       end
 
@@ -79,11 +79,11 @@ module RestfulMetrics
       content
     end
 
-    def send_request(method, endpoint, headers, data=nil)      
+    def send_request(method, endpoint, headers, data=nil)
       begin
-        response = RestClient::Request.execute(:method => :post, 
-                                               :url => endpoint, 
-                                               :payload => data, 
+        response = RestClient::Request.execute(:method => :post,
+                                               :url => endpoint,
+                                               :payload => data,
                                                :headers => headers)
       rescue => e
         logger "there was an error transmitting your entry: #{$!}"
