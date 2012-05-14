@@ -3,7 +3,7 @@ PATH
   specs:
     couchlogic (1.1.0)
       rest-client (~> 1.6.0)
-      yajl-ruby (~> 0.8.1)
+      yajl-ruby (~> 1.0)
 
 GEM
   remote: http://rubygems.org/
@@ -51,7 +51,7 @@ GEM
       diff-lcs (~> 1.1.2)
     rspec-mocks (2.8.0)
     tzinfo (0.3.31)
-    yajl-ruby (0.8.3)
+    yajl-ruby (1.1.0)
 
 PLATFORMS
   ruby
