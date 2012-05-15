@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.authors = ["Mauricio Gomes"]
   s.email = "mauricio@restful-labs.com"
 
-  s.add_dependency "yajl-ruby", "~> 0.8.1"
+  s.add_dependency "yajl-ruby", ">= 0.8.1"
   s.add_dependency "rest-client", "~> 1.6.0"
 
   s.add_development_dependency "rspec", "~> 2.8.0"
