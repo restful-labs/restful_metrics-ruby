@@ -24,5 +24,6 @@ module RestfulMetrics
   class InsufficentArguments < RestfulMetricsError; end
   class InvalidAPIKey < RestfulMetricsError; end
   class NoConnectionEstablished < RestfulMetricsError; end
-  
+  class InvalidTimestamp < RestfulMetricsError; end
+
 end

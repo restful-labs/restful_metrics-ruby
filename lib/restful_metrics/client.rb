@@ -44,27 +44,43 @@ module RestfulMetrics
         @@disabled
       end
 
-      def add_metric(fqdn, name, value, distinct_id = nil)
+      def add_metric(*args)
+        options = extract_options!(args)
+
         params = Hash.new
         params[:metric] = Hash.new
-        params[:metric][:fqdn] = fqdn
-        params[:metric][:name] = name
-        params[:metric][:value] = value
-        unless distinct_id.nil?
-          params[:metric][:distinct_id] = distinct_id
+        params[:metric][:fqdn] = options[:app]
+        params[:metric][:name] = options[:name]
+        params[:metric][:value] = options[:value]
+
+        unless options[:distinct_id].nil?
+          params[:metric][:distinct_id] = options[:distinct_id]
+        end
+
+        unless options[:occurred_at].nil?
+          raise InvalidTimestamp unless options[:occurred_at].respond_to?(:to_i)
+          params[:metric][:occurred_at] = options[:occurred_at].to_i
         end
 
         post(Endpoint.metrics, params)
       end
 
-      def add_compound_metric(fqdn, name, values, distinct_id = nil)
+      def add_compound_metric(*args)
+        options = extract_options!(args)
+
         params = Hash.new
         params[:compound_metric] = Hash.new
-        params[:compound_metric][:fqdn] = fqdn
-        params[:compound_metric][:name] = name
-        params[:compound_metric][:values] = values
-        unless distinct_id.nil?
-          params[:compound_metric][:distinct_id] = distinct_id
+        params[:compound_metric][:app] = options[:app]
+        params[:compound_metric][:name] = options[:name]
+        params[:compound_metric][:values] = options[:values]
+
+        unless options[:distinct_id].nil?
+          params[:compound_metric][:distinct_id] = options[:distinct_id]
+        end
+
+        unless options[:occurred_at].nil?
+          raise InvalidTimestamp unless options[:occurred_at].respond_to?(:to_i)
+          params[:compound_metric][:occurred_at] = options[:occurred_at].to_i
         end
 
         post(Endpoint.compound_metrics, params)

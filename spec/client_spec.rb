@@ -4,13 +4,13 @@ describe "A NON-initialized RESTful Metrics client" do
 
   it "should NOT send a metric data point" do
     lambda {
-      RestfulMetrics::Client.add_metric("foo.bar.org", "hit", 1)
+      RestfulMetrics::Client.add_metric(:app => "foo.bar.org", :name => "hit", :value => 1)
     }.should raise_error(RestfulMetrics::NoConnectionEstablished)
   end
 
   it "should NOT send a compound metric data point" do
     lambda {
-      RestfulMetrics::Client.add_compound_metric("foo.bar.org", "hit", [1,2,3])
+      RestfulMetrics::Client.add_compound_metric(:app => "foo.bar.org", :name => "hit", :values => [1,2,3])
     }.should raise_error(RestfulMetrics::NoConnectionEstablished)
   end
 
@@ -23,13 +23,13 @@ describe "A NON-initialized RESTful Metrics client" do
 
     it "should NOT send a metric data point" do
       lambda {
-        RestfulMetrics::Client.add_metric("foo.bar.org", "hit", 1).should be_true
+        RestfulMetrics::Client.add_metric(:app => "foo.bar.org", :name => "hit", :value => 1).should be_true
       }.should raise_error(RestfulMetrics::NoConnectionEstablished)
     end
 
     it "should NOT send a compound metric data point" do
       lambda {
-        RestfulMetrics::Client.add_compound_metric("foo.bar.org", "hit", [1,2,3]).should be_true
+        RestfulMetrics::Client.add_compound_metric(:app => "foo.bar.org", :name => "hit", :values => [1,2,3]).should be_true
       }.should raise_error(RestfulMetrics::NoConnectionEstablished)
     end
 
@@ -49,12 +49,12 @@ describe "A disabled RESTful Metrics client" do
 
   it "should NOT send a metric if the client is in disabled-mode" do
     RestfulMetrics::Client.expects(:transmit).never
-    RestfulMetrics::Client.add_metric("foo.bar.org", "hit", 1).should == false
+    RestfulMetrics::Client.add_metric(:app => "foo.bar.org", :name => "hit", :value => 1).should == false
   end
 
   it "should NOT send a compound metric if the client is in disabled-mode" do
     RestfulMetrics::Client.expects(:transmit).never
-    RestfulMetrics::Client.add_compound_metric("foo.bar.org", "hit", [1,2,3]).should == false
+    RestfulMetrics::Client.add_compound_metric(:app => "foo.bar.org", :name => "hit", :values => [1,2,3]).should == false
   end
 
 end
@@ -95,11 +95,11 @@ describe "An initialized RESTful Metrics client" do
     end
 
     it "should send a metric to RESTful Metrics while outputting debug info" do
-      RestfulMetrics::Client.add_metric("foo.bar.org", "hit", 1).should be_true
+      RestfulMetrics::Client.add_metric(:app => "foo.bar.org", :name => "hit", :value => 1).should be_true
     end
 
     it "should send the compound metric to RESTful Metrics while outputting debug info" do
-      RestfulMetrics::Client.add_compound_metric("foo.bar.org", "hit", [1,2,3]).should be_true
+      RestfulMetrics::Client.add_compound_metric(:app => "foo.bar.org", :name => "hit", :values => [1,2,3]).should be_true
     end
 
   end
@@ -125,11 +125,11 @@ describe "An initialized RESTful Metrics client" do
     end
 
     it "should send the metric to RESTful Metrics" do
-      RestfulMetrics::Client.add_metric("foo.bar.org", "hit", 1).should be_true
+      RestfulMetrics::Client.add_metric(:app => "foo.bar.org", :name => "hit", :value => 1, :occurred_at => Time.now).should be_true
     end
 
     it "should send the compound metric to RESTful Metrics" do
-      RestfulMetrics::Client.add_compound_metric("foo.bar.org", "hit", [1,2,3]).should be_true
+      RestfulMetrics::Client.add_compound_metric(:app => "foo.bar.org", :name => "hit", :values => [1,2,3], :occurred_at => Time.now).should be_true
     end
 
   end
@@ -142,13 +142,36 @@ describe "An initialized RESTful Metrics client" do
     end
 
     it "should create a delayed job for the metric" do
-      RestfulMetrics::Client.add_metric("foo.bar.org", "hit", 1).should be_true
+      RestfulMetrics::Client.add_metric(:app => "foo.bar.org", :name => "hit", :value => 1, :occurred_at => Time.now).should be_true
       Delayed::Job.count.should == 1
     end
 
     it "should create a delayed job for the compound metric" do
-      RestfulMetrics::Client.add_compound_metric("foo.bar.org", "hit", [1,2,3]).should be_true
+      RestfulMetrics::Client.add_compound_metric(:app => "foo.bar.org", :name => "hit", :values => [1,2,3], :occurred_at => Time.now).should be_true
       Delayed::Job.count.should == 1
+    end
+
+  end
+
+  describe "raising errors" do
+
+    before(:all) do
+      RestfulMetrics::Client.async = false
+      RestfulMetrics::Client.async?.should be_false
+    end
+
+    it "should NOT accept an invalid occurred_at timestamp when sending metrics" do
+      lambda {
+        RestfulMetrics::Client.add_metric(:app => "foo.bar.org", :name => "hit", :value => 1, :occurred_at => Date.today)
+      }.should raise_error(RestfulMetrics::InvalidTimestamp)
+      Delayed::Job.count.should == 0
+    end
+
+    it "should NOT accept an invalid occurred_at timestamp when sending compound metrics" do
+      lambda {
+        RestfulMetrics::Client.add_compound_metric(:app => "foo.bar.org", :name => "hit", :values => [1,2,3], :occurred_at => Date.today).should be_false
+      }.should raise_error(RestfulMetrics::InvalidTimestamp)
+      Delayed::Job.count.should == 0
     end
 
   end
