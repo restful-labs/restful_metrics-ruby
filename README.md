@@ -6,6 +6,8 @@ For more detailed instructions, check out our [Dev Center](http://devcenter.rest
 
 ## Install
 
+* Version 1.x of this client is deprecated. Please switch to 2.x *
+
 ```
   gem install restful_metrics-ruby
 ```
