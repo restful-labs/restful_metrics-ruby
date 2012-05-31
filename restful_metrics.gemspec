@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.description = %q{Ruby client for the RESTful Metrics service.}
   s.homepage = %q{http://github.com/restful-labs/resetful_metrics-ruby}
   s.version = File.read(File.join(File.dirname(__FILE__), 'VERSION'))
-  s.authors = ["Mauricio Gomes"]
+  s.authors = ["Mauricio Gomes", "Dan Porter"]
   s.email = "mauricio@restful-labs.com"
 
   s.add_dependency "yajl-ruby", ">= 0.8.1"

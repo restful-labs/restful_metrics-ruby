@@ -117,3 +117,4 @@ Copyright (c) 2011-2012 RESTful Labs LLC. See LICENSE for details.
 ## Authors
 
 * [Mauricio Gomes](http://github.com/mgomes)
+* [Dan Porter](http://github.com/wolfpakz)
