@@ -13,11 +13,11 @@ require 'restful_metrics/endpoint'
 require 'restful_metrics/client'
 
 # Rails integration
-require 'restful_metrics/railtie/cookie_integration'  
+require 'restful_metrics/railtie/cookie_integration'
 
 module RestfulMetrics
-  
-  REALM = "http://track.restfulmetrics.com"
+
+  REALM = "https://track.restfulmetrics.com"
   VERSION = File.read(File.join(File.dirname(__FILE__), '..', 'VERSION'))
 
   class RestfulMetricsError < StandardError; end
