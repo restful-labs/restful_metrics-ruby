@@ -9,7 +9,7 @@ For more detailed instructions, check out our [Dev Center](http://devcenter.rest
 * Please note the syntax for version 2.x of the Ruby client has changed. *
 
 ```
-  gem install restful_metrics-ruby
+  gem install restful_metrics
 ```
 
 ## Configure
