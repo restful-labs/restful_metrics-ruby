@@ -13,7 +13,8 @@ module RestfulMetrics
       end
 
       def endpoint_url(path)
-        [REALM, path].join('/')
+        realm = (ENV['RESTFUL_METRICS_REALM'] || REALM)
+        [realm, path].join('/')
       end
 
     end
