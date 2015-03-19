@@ -5,7 +5,7 @@ module RestfulMetrics
     extend LogTools
 
     @@connection = nil
-    @@debug, @@async, @@disabled = false
+    @@debug, @@disabled = false
 
     class << self
 
@@ -22,18 +22,6 @@ module RestfulMetrics
 
       def debug?
         @@debug
-      end
-
-      def async=(async_flag)
-        # DelayedJob integration
-        require 'delayed_job' if async_flag
-
-        @@async = async_flag && (defined?(Delayed) != nil)
-        @@connection.async = @@async if @@connection
-      end
-
-      def async?
-        @@async
       end
 
       def disabled=(disabled_flag)
@@ -96,12 +84,7 @@ module RestfulMetrics
 
         raise NoConnectionEstablished if @@connection.nil?
 
-        if async?
-          self.delay.transmit(endpoint, data)
-          true
-        else
-          transmit(endpoint, data)
-        end
+        transmit(endpoint, data)
       end
 
       def transmit(endpoint, data)

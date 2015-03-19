@@ -83,7 +83,6 @@ describe "An initialized RESTful Metrics client" do
     RestfulMetrics::Client.disabled = false
     RestClient::Request.any_instance.stubs(:execute).returns(SampleRequest.new)
     Logger.any_instance.stubs(:warn).returns("") # disable output
-    Delayed::Job.delete_all
   end
 
   describe "in debug mode" do
@@ -110,20 +109,9 @@ describe "An initialized RESTful Metrics client" do
       RestfulMetrics::Client.set_credentials('4ed4ef44e44ed4').should be_true
     end
 
-    it "should set async mode when delayed_job is loaded" do
-      RestfulMetrics::Client.async = true
-      RestfulMetrics::Client.async?.should be_true
-    end
-
   end
 
-  describe "adding metrics synchronously" do
-
-    before(:all) do
-      RestfulMetrics::Client.async = false
-      RestfulMetrics::Client.async?.should be_false
-    end
-
+  describe "adding metrics" do
     it "should send the metric to RESTful Metrics" do
       RestfulMetrics::Client.add_metric(:app => "foo.bar.org", :name => "hit", :value => 1, :occurred_at => Time.now).should be_true
     end
@@ -134,44 +122,18 @@ describe "An initialized RESTful Metrics client" do
 
   end
 
-  describe "adding metrics asynchronously" do
-
-    before(:all) do
-      RestfulMetrics::Client.async = true
-      RestfulMetrics::Client.async?.should be_true
-    end
-
-    it "should create a delayed job for the metric" do
-      RestfulMetrics::Client.add_metric(:app => "foo.bar.org", :name => "hit", :value => 1, :occurred_at => Time.now).should be_true
-      Delayed::Job.count.should == 1
-    end
-
-    it "should create a delayed job for the compound metric" do
-      RestfulMetrics::Client.add_compound_metric(:app => "foo.bar.org", :name => "hit", :values => [1,2,3], :occurred_at => Time.now).should be_true
-      Delayed::Job.count.should == 1
-    end
-
-  end
-
   describe "raising errors" do
-
-    before(:all) do
-      RestfulMetrics::Client.async = false
-      RestfulMetrics::Client.async?.should be_false
-    end
 
     it "should NOT accept an invalid occurred_at timestamp when sending metrics" do
       lambda {
         RestfulMetrics::Client.add_metric(:app => "foo.bar.org", :name => "hit", :value => 1, :occurred_at => Date.today)
       }.should raise_error(RestfulMetrics::InvalidTimestamp)
-      Delayed::Job.count.should == 0
     end
 
     it "should NOT accept an invalid occurred_at timestamp when sending compound metrics" do
       lambda {
         RestfulMetrics::Client.add_compound_metric(:app => "foo.bar.org", :name => "hit", :values => [1,2,3], :occurred_at => Date.today).should be_false
       }.should raise_error(RestfulMetrics::InvalidTimestamp)
-      Delayed::Job.count.should == 0
     end
 
   end
