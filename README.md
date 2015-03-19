@@ -6,10 +6,10 @@ For more detailed instructions, check out our [Dev Center](http://devcenter.rest
 
 ## Install
 
-* Version 1.x of this client is deprecated. Please switch to 2.x *
+* Please note the syntax for version 2.x of the Ruby client has changed. *
 
 ```
-  gem install restful_metrics-ruby
+  gem install restful_metrics
 ```
 
 ## Configure
@@ -21,8 +21,6 @@ The only step required for initialization is setting your API key. Once it's set
 ``` ruby
   RestfulMetrics::Client.set_credentials('214c7da8edd333abc78712313918ffe5')
 ```
-
-You can skip this step if you've installed the RESTful Metrics Heroku Addon.
 
 ### Disable Flag
 
@@ -48,22 +46,22 @@ If you use a worker library other than Delayed::Job, you can wrap all your RESTf
   module CompoundMetric
     @queue = :metrics
 
-    def self.perform(fqdn, name, values, distinct_id = nil)
-      RestfulMetrics::Client.add_compound_metric(fqdn, name, values, distinct_id)
+    def self.perform(fqdn, name, values, timestamp=nil, distinct_id=nil)
+      RestfulMetrics::Client.add_compound_metric(:app => fqdn, :name => name, :values => values, :occurred_at => timestamp, :distinct_id => distinct_id)
     end
   end
 
   module Metric
     @queue = :metrics
 
-    def self.perform(fqdn, name, value, distinct_id = nil)
-      RestfulMetrics::Client.add_metric(fqdn, name, value, distinct_id)
+    def self.perform(fqdn, name, value, timestamp=nil, distinct_id=nil)
+      RestfulMetrics::Client.add_metric(:app => fqdn, :name => name, :value => value, :occurred_at => timestamp, :distinct_id => distinct_id)
     end
   end
 
-  def restful_metrics_add_data_point(metric_type, app, metric, value, distinct_id=nil)
+  def restful_metrics_add_data_point(metric_type, app, metric, value, timestamp=nil, distinct_id=nil)
     unless RestfulMetrics::Client.disabled?
-      Resque.enqueue(metric_type, app, metric, value, distinct_id)
+      Resque.enqueue(metric_type, app, metric, value, timestamp, distinct_id)
     end
   end
 ```
@@ -71,7 +69,7 @@ If you use a worker library other than Delayed::Job, you can wrap all your RESTf
 We've now separated the metrics and compound metrics into their own queue called `metrics`. To add a compound metric data point, we call:
 
 ``` ruby
-    restful_metrics_add_data_point(CompoundMetric, "myapp.com", "impression", ["apple juice", "orange juice", "soda"], "fe352fe23e823668e23e7")
+    restful_metrics_add_data_point(CompoundMetric, "myapp.com", "impression", ["apple juice", "orange juice", "soda"], Time.now, "fe352fe23e823668e23e7")
 ```
 
 Make sure that the `async` flag is set to off. This flag only applies to the built-in Delayed::Job support.
@@ -87,12 +85,13 @@ Attribute                 | Value
 Application Identifier    | "myapp.com"
 Metric Name               | "impression"
 Value                     | 1
+Occurred At               | Time or DateTime object
 Distinct User Identifier  | "fe352fe23e823668e23e7"
 
 You would transmit this data point with the following:
 
 ``` ruby
-  RestfulMetrics::Client.add_metric("myapp.com", "impression", 1, "fe352fe23e823668e23e7")
+  RestfulMetrics::Client.add_metric(:app => "myapp.com", :name => "impression", :value => 1, :occurred_at => Time.now, :distinct_id => "fe352fe23e823668e23e7")
 ```
 
 ### Compound Metrics
@@ -104,12 +103,13 @@ Attribute                 | Value
 Application Identifier    | "myapp.com"
 Compound Metric Name      | "beverage_search"
 Values                    | ["apple juice", "orange juice", "soda"]
+Occurred At               | Time or DateTime object
 Distinct User Identifier  | "fe352fe23e823668e23e7"
 
 You would transmit this data point with the following:
 
 ``` ruby
-  RestfulMetrics::Client.add_compound_metric("myapp.com", "impression", ["apple juice", "orange juice", "soda"], "fe352fe23e823668e23e7")
+  RestfulMetrics::Client.add_compound_metric(:app => "myapp.com", :name => "impression", :values => ["apple juice", "orange juice", "soda"], :occurred_at => Time.now, :distinct_id => "fe352fe23e823668e23e7")
 ```
 
 ## Copyright
