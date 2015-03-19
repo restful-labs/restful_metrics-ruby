@@ -45,7 +45,10 @@ module RestfulMetrics
           params[:metric][:distinct_id] = options[:distinct_id]
         end
 
-        unless options[:occurred_at].nil?
+        if options[:occurred_at].nil?
+          params[:metric][:occurred_at] = Time.now.to_i
+        else
+
           raise InvalidTimestamp unless options[:occurred_at].respond_to?(:to_i)
           params[:metric][:occurred_at] = options[:occurred_at].to_i
         end
@@ -58,7 +61,7 @@ module RestfulMetrics
 
         params = Hash.new
         params[:compound_metric] = Hash.new
-        params[:compound_metric][:app] = options[:app]
+        params[:compound_metric][:fqdn] = options[:app]
         params[:compound_metric][:name] = options[:name]
         params[:compound_metric][:values] = options[:values]
 
@@ -66,9 +69,11 @@ module RestfulMetrics
           params[:compound_metric][:distinct_id] = options[:distinct_id]
         end
 
-        unless options[:occurred_at].nil?
+        params[:compound_metric][:occurred_at] = if options[:occurred_at].nil?
+          Time.now.to_i
+        else
           raise InvalidTimestamp unless options[:occurred_at].respond_to?(:to_i)
-          params[:compound_metric][:occurred_at] = options[:occurred_at].to_i
+          options[:occurred_at].to_i
         end
 
         post(Endpoint.compound_metrics, params)

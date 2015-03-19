@@ -122,6 +122,48 @@ describe "An initialized RESTful Metrics client" do
 
   end
 
+  describe '#add_metric' do
+    let(:params) {
+      p = {:app => "foo.bar.org", :name => "hit", :value => 1}
+      p[:occurred_at] = occurred_at unless occurred_at.blank?
+      p
+    }
+
+    context 'when :occurred_at is blank' do
+      let(:occurred_at) { nil }
+
+      it 'fills in the current time' do
+        #TODO: Use the same parameter names everywhere. Move translations out to the boundary of our system.
+        params_with_timestamp = { :metric => params.merge(:occurred_at => Time.now.to_i) }
+        params_with_timestamp[:metric][:fqdn] = params_with_timestamp[:metric].delete(:app)
+
+        RestfulMetrics::Client.expects(:post).with(RestfulMetrics::Endpoint.metrics, params_with_timestamp)
+        RestfulMetrics::Client.add_metric(params)
+      end
+    end
+  end
+
+  describe '#add_compound_metric' do
+    let(:params) {
+      p = {:app => "foo.bar.org", :name => "hit", :values => [1, 2, 3]}
+      p[:occurred_at] = occurred_at unless occurred_at.blank?
+      p
+    }
+
+    context 'when :occurred_at is blank' do
+      let(:occurred_at) { nil }
+
+      it 'fills in the current time' do
+        #TODO: Use the same parameter names everywhere. Move translations out to the boundary of our system.
+        params_with_timestamp = { :compound_metric => params.merge(:occurred_at => Time.now.to_i) }
+        params_with_timestamp[:compound_metric][:fqdn] = params_with_timestamp[:compound_metric].delete(:app)
+
+        RestfulMetrics::Client.expects(:post).with(RestfulMetrics::Endpoint.compound_metrics, params_with_timestamp)
+        RestfulMetrics::Client.add_compound_metric(params)
+      end
+    end
+  end
+
   describe "raising errors" do
 
     it "should NOT accept an invalid occurred_at timestamp when sending metrics" do
