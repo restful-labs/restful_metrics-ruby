@@ -32,22 +32,22 @@ The client also has an optional flag that prevents the client from actually send
 
 We added the optional conditional check in the above example to illustrate how the flag can be set dynamically during your application's launch.
 
-### Asynchronous Mode
+### Asynchronous Transmission
 
-The client currently has built-in support for Delayed::Job. If you enable the asynchronous flag the client will automatically queue the data point for transmission to the server at a later time. This is highly recommended for applications that are sensitive to latency.
+You can wrap all your RESTful Metrics calls with Delayed::Job / Resque / Sidekiq, etc.
 
-``` ruby
-  RestfulMetrics::Client.async = true
-```
-
-If you use a worker library other than Delayed::Job, you can wrap all your RESTful Metrics calls. For example, if we were using Resque we might add this to an initializer:
+For example:
 
 ``` ruby
   module CompoundMetric
     @queue = :metrics
 
     def self.perform(fqdn, name, values, timestamp=nil, distinct_id=nil)
-      RestfulMetrics::Client.add_compound_metric(:app => fqdn, :name => name, :values => values, :occurred_at => timestamp, :distinct_id => distinct_id)
+      RestfulMetrics::Client.add_compound_metric :app => fqdn,
+                                                 :name => name,
+                                                 :values => values,
+                                                 :occurred_at => timestamp,
+                                                 :distinct_id => distinct_id
     end
   end
 
@@ -55,13 +55,11 @@ If you use a worker library other than Delayed::Job, you can wrap all your RESTf
     @queue = :metrics
 
     def self.perform(fqdn, name, value, timestamp=nil, distinct_id=nil)
-      RestfulMetrics::Client.add_metric(:app => fqdn, :name => name, :value => value, :occurred_at => timestamp, :distinct_id => distinct_id)
-    end
-  end
-
-  def restful_metrics_add_data_point(metric_type, app, metric, value, timestamp=nil, distinct_id=nil)
-    unless RestfulMetrics::Client.disabled?
-      Resque.enqueue(metric_type, app, metric, value, timestamp, distinct_id)
+      RestfulMetrics::Client.add_metric :app => fqdn,
+                                        :name => name,
+                                        :value => value,
+                                        :occurred_at => timestamp,
+                                        :distinct_id => distinct_id
     end
   end
 ```
@@ -69,10 +67,12 @@ If you use a worker library other than Delayed::Job, you can wrap all your RESTf
 We've now separated the metrics and compound metrics into their own queue called `metrics`. To add a compound metric data point, we call:
 
 ``` ruby
-    restful_metrics_add_data_point(CompoundMetric, "myapp.com", "impression", ["apple juice", "orange juice", "soda"], Time.now, "fe352fe23e823668e23e7")
+    Resque.enqueue CompoundMetric, :app => 'myapp.com',
+                                   :name => 'impression',
+                                   :values => ['apple juice', 'orange juice', 'soda'],
+                                   :occurred_at => Time.now,
+                                   :distinct_id => user.uuid
 ```
-
-Make sure that the `async` flag is set to off. This flag only applies to the built-in Delayed::Job support.
 
 ## Sending Data Points
 
