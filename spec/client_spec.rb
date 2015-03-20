@@ -71,7 +71,7 @@ describe "An initialized RESTful Metrics client" do
       200
     end
 
-    def header
+    def headers
       { "one" => "test", "two" => "test" }
     end
 
