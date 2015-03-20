@@ -55,12 +55,12 @@ module RestfulMetrics
         if response.nil?
           logger "There was an error processing the response from Restful Metrics."
         else
-          logger "\nresponse: #{response.code}"
-          logger "headers:"
-          response.header.each do |key, value|
+          logger "Response Code: #{response.code}"
+          logger "Response Headers:"
+          response.headers.each do |key, value|
             logger "#{key}=#{value}"
           end
-          logger "body:"
+          logger "Body:"
           logger response.body
         end
       end
