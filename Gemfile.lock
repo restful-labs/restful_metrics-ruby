@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    restful_metrics (2.0.0)
+    restful_metrics (2.0.0.pre.alpha.1)
       rest-client (~> 1.6.0)
       yajl-ruby (>= 0.8.1)
 
